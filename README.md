@@ -1,138 +1,138 @@
 # CourseAdvisor
 
-**CourseAdvisor** - дипломный проект: интеллектуальная веб-система персональных
-рекомендаций открытых учебных курсов для студентов.
+**CourseAdvisor** is a diploma project: an intelligent web-based recommendation
+system for open online courses.
 
-Система анализирует профиль студента, средний балл, желаемое направление,
-результаты многофакторного теста и каталог бесплатных образовательных ресурсов.
-На основе этих данных она формирует персональный список курсов, рассчитывает
-рейтинг и прогноз успешного прохождения.
+The system analyzes a student's profile, academic score, target IT direction,
+multi-factor test results, and a catalog of free educational resources. Based on
+these signals, it generates personalized course recommendations, calculates a
+ranking score, and predicts the probability of successful course completion.
 
-## Возможности
+## Features
 
-- Авторизация студентов и администраторов.
-- Персональный тест интересов и навыков.
-- Средний балл студента подтягивается из базы данных.
-- Рекомендации строятся по тегам, направлению, сложности и профилю студента.
-- Для каждого курса считается рейтинг и вероятность успешного прохождения.
-- История попыток прохождения теста сохраняется в PostgreSQL.
-- Каталог открытых курсов из реальных бесплатных источников.
-- Опциональная интеграция с LLM для генерации объяснений рекомендаций.
-- Django Admin для управления студентами, курсами, интересами и рекомендациями.
-- Светлая и темная тема интерфейса с сохранением выбора в браузере.
+- Student and administrator authentication.
+- Personalized interest and skill assessment test.
+- Student academic score is loaded from the database.
+- Recommendations are based on tags, target direction, difficulty, and student profile.
+- Each course receives a ranking score and success prediction.
+- Test attempt history is stored in PostgreSQL.
+- Catalog of real open and free educational resources.
+- Optional LLM integration for generating recommendation explanations.
+- Django Admin for managing students, courses, interests, and recommendations.
+- Light and dark UI themes with browser-side preference persistence.
 
-## Используемые источники курсов
+## Course Sources
 
-В демо-каталог включены открытые и бесплатные образовательные ресурсы:
+The demo catalog includes open and free educational resources:
 
-| Источник | Что используется |
+| Source | Used For |
 | --- | --- |
 | METANIT | Python, SQL, JavaScript |
-| roadmap.sh | Roadmaps по Backend, Frontend, DevOps, Data, ML, Security |
-| Stepik | Python и SQL-тренажеры |
-| freeCodeCamp | Web, JavaScript, Relational Database |
-| CodeBasics | Базовые интерактивные курсы |
-| Hexlet | Бесплатные вводные курсы |
+| roadmap.sh | Backend, Frontend, DevOps, Data, ML, and Security roadmaps |
+| Stepik | Python and SQL practice courses |
+| freeCodeCamp | Web, JavaScript, and Relational Database tracks |
+| CodeBasics | Beginner-friendly interactive courses |
+| Hexlet | Free introductory programming courses |
 
-## Почему проект сложный
+## Why This Project Is Non-Trivial
 
-Проект не является обычным сайтом со списком курсов. В нем реализована
-рекомендательная логика, которая учитывает несколько факторов:
+CourseAdvisor is not just a static list of courses. It implements a
+recommendation workflow that uses multiple factors:
 
-- академическую успеваемость студента по шкале 1-100;
-- желаемое IT-направление;
-- текущий уровень подготовки;
-- предпочтительный формат обучения;
-- мотивацию;
-- доступное время на обучение в неделю;
-- интерес к типам задач;
-- самооценку технических навыков;
-- сложность курса;
-- совпадение интересов студента с тегами курса.
+- student academic performance on a 1-100 scale;
+- desired IT direction;
+- current experience level;
+- preferred learning format;
+- motivation;
+- available study time per week;
+- interest in different task types;
+- self-assessed technical skills;
+- course difficulty;
+- match between student interests and course tags.
 
-Каждая попытка тестирования сохраняется в базе, поэтому систему можно расширять
-до аналитики динамики интересов студента.
+Every test attempt is stored in the database, which makes it possible to extend
+the system with analytics and student interest tracking over time.
 
-## Технологический стек
+## Tech Stack
 
-| Компонент | Технология |
+| Component | Technology |
 | --- | --- |
 | Backend | Django 6 |
 | Database | PostgreSQL |
 | ORM | Django ORM |
 | UI | Django Templates, Bootstrap 5, CSS |
-| Auth | Django Authentication |
-| Admin panel | Django Admin |
-| LLM integration | OpenAI SDK, optional |
+| Authentication | Django Authentication |
+| Admin Panel | Django Admin |
+| LLM Integration | OpenAI SDK, optional |
 | Tests | Django TestCase |
 
-## Архитектура данных
+## Data Model
 
-Основные сущности:
+Main entities:
 
-- `StudentProfile` - профиль студента, группа, семестр, средний балл.
-- `Interest` - возможные интересы и категории.
-- `StudentInterest` - связь студента с интересом и весом интереса.
-- `StudentTestAttempt` - сохраненная попытка прохождения теста.
-- `Course` - открытый курс, источник, ссылка, направление, сложность.
-- `CourseTag` - теги курса.
-- `Prerequisite` - предварительные требования курса.
-- `Grade` - оценки студента.
-- `Recommendation` - рассчитанная рекомендация.
+- `StudentProfile` - student profile, group, semester, and academic score.
+- `Interest` - possible interests and categories.
+- `StudentInterest` - relation between a student and an interest with a weight.
+- `StudentTestAttempt` - saved result of a completed assessment test.
+- `Course` - open course with source, URL, direction, and difficulty.
+- `CourseTag` - tags assigned to a course.
+- `Prerequisite` - course prerequisites.
+- `Grade` - student grades.
+- `Recommendation` - calculated recommendation result.
 
-## Сценарий работы
+## User Flow
 
-1. Студент входит в систему по логину и паролю.
-2. Система находит его профиль в базе данных.
-3. Студент проходит многофакторный тест.
-4. Ответы сохраняются в базе как попытка тестирования.
-5. Система пересчитывает интересы студента.
-6. Алгоритм сравнивает профиль студента с каталогом курсов.
-7. Студент получает персональные рекомендации.
+1. A student signs in with a username and password.
+2. The system finds the student's profile in the database.
+3. The student completes a multi-factor assessment test.
+4. The answers are saved as a test attempt.
+5. The system recalculates the student's interest profile.
+6. The recommendation algorithm compares the profile with the course catalog.
+7. The student receives personalized course recommendations.
 
-## Алгоритм рекомендаций
+## Recommendation Algorithm
 
-Алгоритм рассчитывает:
+The algorithm calculates:
 
-- совпадение интересов студента с тегами курса;
-- вес сложности курса;
-- прогноз успешности с учетом среднего балла;
-- итоговый рейтинг курса;
-- текстовое объяснение рекомендации.
+- match between student interests and course tags;
+- course difficulty score;
+- success probability based on academic score;
+- final course ranking score;
+- recommendation explanation.
 
-Если включена LLM-интеграция, языковая модель дополнительно формирует более
-естественное объяснение для топ-5 рекомендаций. При этом сам расчет рейтинга
-остается локальным и прозрачным.
+If LLM integration is enabled, a language model generates a more natural
+explanation for the top 5 recommendations. The ranking score itself remains
+local and transparent.
 
-## Быстрый запуск
+## Quick Start
 
-### 1. Клонировать проект
+### 1. Clone the Repository
 
 ```bash
 git clone <repo-url>
 cd diplom
 ```
 
-### 2. Создать и активировать виртуальное окружение
+### 2. Create and Activate a Virtual Environment
 
 ```bash
 python -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Установить зависимости
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Создать PostgreSQL-базу
+### 4. Create the PostgreSQL Database
 
 ```bash
 createdb course_recommender_db
 ```
 
-Параметры подключения по умолчанию:
+Default database configuration:
 
 ```text
 POSTGRES_DB=course_recommender_db
@@ -142,48 +142,48 @@ POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 ```
 
-Их можно переопределить через переменные окружения.
+These values can be overridden with environment variables.
 
-### 5. Применить миграции
+### 5. Apply Migrations
 
 ```bash
 python manage.py migrate
 ```
 
-### 6. Заполнить демо-данные
+### 6. Seed Demo Data
 
 ```bash
 python manage.py seed_data
 ```
 
-Команда создаст:
+The command creates:
 
-- 30 демо-студентов;
-- каталог открытых курсов;
-- интересы;
-- оценки;
-- теги курсов;
-- предварительные требования.
+- 30 demo students;
+- an open course catalog;
+- interests;
+- grades;
+- course tags;
+- prerequisites.
 
-### 7. Запустить сервер
+### 7. Run the Development Server
 
 ```bash
 python manage.py runserver 127.0.0.1:8000
 ```
 
-## Основные страницы
+## Main Pages
 
-| URL | Назначение |
+| URL | Purpose |
 | --- | --- |
-| `/` | Главная страница |
-| `/login/` | Вход в систему |
-| `/students/test/` | Многофакторный тест |
-| `/recommendations/` | Рекомендации текущего студента |
-| `/admin/` | Админ-панель |
+| `/` | Home page |
+| `/login/` | Sign in |
+| `/students/test/` | Multi-factor assessment test |
+| `/recommendations/` | Recommendations for the current student |
+| `/admin/` | Admin panel |
 
-## Демо-аккаунты
+## Demo Accounts
 
-После выполнения `python manage.py seed_data` создаются студенты:
+After running `python manage.py seed_data`, demo students are created:
 
 ```text
 student1 / 12345
@@ -192,24 +192,24 @@ student2 / 12345
 student30 / 12345
 ```
 
-Администратора можно создать командой:
+Create an administrator account:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Если администратор уже есть, но пароль неизвестен:
+If an administrator already exists but the password is unknown:
 
 ```bash
 python manage.py changepassword <username>
 ```
 
-## Интеграция с LLM
+## LLM Integration
 
-Проект работает без API-ключа. В этом случае рекомендации и объяснения строятся
-локальным алгоритмом.
+The project works without an API key. In that mode, recommendations and
+explanations are generated by the local algorithm.
 
-Чтобы включить генерацию объяснений через OpenAI API:
+To enable OpenAI-powered explanations:
 
 ```bash
 export OPENAI_API_KEY="your_api_key_here"
@@ -217,41 +217,42 @@ export ENABLE_LLM_EXPLANATIONS=true
 export OPENAI_MODEL="gpt-5.2"
 ```
 
-После этого система будет использовать языковую модель для объяснений топ-5
-рекомендаций.
+After that, the system will use a language model to generate explanations for
+the top 5 recommendations.
 
-## Тестирование
+## Testing
 
 ```bash
 python manage.py test
 ```
 
-Тесты проверяют:
+Tests cover:
 
-- расчет рекомендаций;
-- прохождение теста студентом;
-- сохранение попытки тестирования;
-- редирект на персональные рекомендации.
+- recommendation scoring;
+- student assessment flow;
+- test attempt persistence;
+- redirect to personalized recommendations.
 
-## Дипломная ценность проекта
+## Diploma Value
 
-Проект демонстрирует несколько важных аспектов разработки:
+The project demonstrates:
 
-- проектирование реляционной базы данных;
-- работу с авторизацией и ролями;
-- реализацию рекомендательного алгоритма;
-- хранение диагностических данных;
-- интеграцию внешних образовательных источников;
-- возможность подключения LLM;
-- разработку пользовательского интерфейса;
-- покрытие ключевой логики тестами.
+- relational database design;
+- authentication and role-based access;
+- recommendation algorithm implementation;
+- diagnostic data persistence;
+- integration of external educational resources;
+- optional LLM integration;
+- user interface development;
+- automated testing of core logic.
 
-## Статус
+## Status
 
-Проект является рабочим MVP дипломной системы. Его можно расширять:
+The project is a working MVP of a diploma recommendation system. Possible future
+improvements:
 
-- историей изменения интересов студента;
-- графиками аналитики;
-- импортом курсов из внешних API;
-- более сложной моделью ранжирования;
-- личным кабинетом студента.
+- student interest history;
+- analytics dashboards;
+- external course API imports;
+- more advanced ranking model;
+- student personal dashboard.
