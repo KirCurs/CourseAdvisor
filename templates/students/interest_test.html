@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}
+Тест интересов
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+    <div>
+        <span class="section-label">Диагностика профиля</span>
+        <h1>Многофакторный тест интересов</h1>
+        <p>
+            Система учитывает выбранное направление, средний балл из базы,
+            текущий уровень, формат обучения, время на учебу, интересы и
+            самооценку навыков. Такой профиль точнее объясняет, почему студенту
+            подходит конкретный открытый курс.
+        </p>
+    </div>
+</section>
+
+{% if student_count == 0 %}
+    <div class="alert alert-warning">
+        В базе нет студентов. Сначала выполните команду генерации демо-данных.
+    </div>
+{% elif not selected_student and not allow_student_choice %}
+    <div class="alert alert-warning">
+        Для вашего аккаунта не найден профиль студента. Создайте профиль в админке
+        или войдите под демо-студентом.
+    </div>
+{% else %}
+    <form method="post" class="test-layout">
+        {% csrf_token %}
+
+        <section class="profile-panel">
+            <div>
+                <span class="section-label">Шаг 1</span>
+                <h2>Профиль студента</h2>
+            </div>
+
+            <div class="row g-3">
+                {% for field in profile_fields %}
+                    {% if field.is_hidden %}
+                        {{ field }}
+                    {% else %}
+                        <div class="col-lg-4 col-md-6">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {{ field.errors }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {% if selected_student %}
+                <div class="alert alert-info mt-3 mb-0">
+                    Тест будет сохранен для студента:
+                    <strong>{{ selected_student.full_name }}</strong>,
+                    группа {{ selected_student.group_name }}.
+                </div>
+            {% endif %}
+
+            <div class="score-strip">
+                <div>
+                    <span>Средний балл из базы</span>
+                    <strong id="student-score">-</strong>
+                </div>
+                <div>
+                    <span>Шкала успеваемости</span>
+                    <strong>1-100</strong>
+                </div>
+                <div>
+                    <span>Факторов анализа</span>
+                    <strong>6</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="questions-panel">
+            <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+                <div>
+                    <span class="section-label">Шаг 2</span>
+                    <h2>Интерес к типам задач</h2>
+                </div>
+                <span class="muted-note">1 - низкий интерес, 5 - высокий</span>
+            </div>
+
+            <div class="question-grid">
+                {% for field in interest_fields %}
+                    <div class="question-card">
+                        <label class="question-title">{{ field.label }}</label>
+
+                        <div class="scale-row">
+                            {% for option in field %}
+                                <label class="scale-option">
+                                    {{ option.tag }}
+                                    <span>{{ option.choice_label|slice:":1" }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+
+                        {{ field.errors }}
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="questions-panel">
+            <div class="d-flex justify-content-between align-items-end flex-wrap gap-3 mb-3">
+                <div>
+                    <span class="section-label">Шаг 3</span>
+                    <h2>Самооценка текущих навыков</h2>
+                </div>
+                <span class="muted-note">1 - не знаю тему, 5 - уверен</span>
+            </div>
+
+            <div class="question-grid">
+                {% for field in skill_fields %}
+                    <div class="question-card">
+                        <label class="question-title">{{ field.label }}</label>
+
+                        <div class="scale-row">
+                            {% for option in field %}
+                                <label class="scale-option">
+                                    {{ option.tag }}
+                                    <span>{{ option.choice_label|slice:":1" }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+
+                        {{ field.errors }}
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="insight-panel">
+            <span class="section-label">Что усложнилось</span>
+            <h2>Как система использует ответы</h2>
+            <div class="metrics-strip">
+                <div>
+                    <span>Интересы</span>
+                    <strong>70%</strong>
+                </div>
+                <div>
+                    <span>Навыки</span>
+                    <strong>45%</strong>
+                </div>
+                <div>
+                    <span>Бонус уровня</span>
+                    <strong>0.85-1.12</strong>
+                </div>
+            </div>
+        </section>
+
+        <div class="submit-bar">
+            <a href="/" class="btn btn-outline-secondary btn-lg">Назад</a>
+            <button type="submit" class="btn btn-primary btn-lg">
+                Сформировать рекомендации
+            </button>
+        </div>
+    </form>
+
+    {{ student_scores|json_script:"student-scores" }}
+    <script>
+        const scores = JSON.parse(document.getElementById("student-scores").textContent);
+        const select = document.getElementById("student-select");
+        const score = document.getElementById("student-score");
+
+        function updateScore() {
+            score.textContent = scores[select.value] ? `${scores[select.value]} / 100` : "-";
+        }
+
+        select.addEventListener("change", updateScore);
+        updateScore();
+    </script>
+{% endif %}
+
+{% endblock %}

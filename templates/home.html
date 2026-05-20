@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}
+Главная
+{% endblock %}
+{% block content %}
+
+<div class="row align-items-center">
+    <div class="col-lg-7">
+        <div class="p-5 bg-white rounded-4 shadow-sm">
+            <span class="badge bg-primary mb-3">Дипломный проект</span>
+
+            <h1 class="display-5 fw-bold mb-3">
+                Интеллектуальная система рекомендаций учебных курсов
+            </h1>
+
+            <p class="lead text-muted">
+                Система анализирует интересы студента, средний балл, сложность
+                дисциплин и формирует персональные рекомендации по открытым
+                курсам и дорожным картам обучения.
+            </p>
+
+            <div class="mt-4">
+                <a href="/students/test/" class="btn btn-primary btn-lg me-2">
+                    Пройти тест
+                </a>
+
+                <a href="/admin/" class="btn btn-outline-secondary btn-lg">
+                    Админ-панель
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5 mt-4 mt-lg-0">
+        <div class="card rounded-4 shadow-sm border-0">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-3">Что учитывает система</h4>
+
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Интересы студента</li>
+                    <li class="list-group-item">Средний академический балл</li>
+                    <li class="list-group-item">Желаемое IT-направление</li>
+                    <li class="list-group-item">Сложность курса</li>
+                    <li class="list-group-item">
+                        Теги и направление дисциплины
+                    </li>
+                    <li class="list-group-item">
+                        Вероятность успешного прохождения
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

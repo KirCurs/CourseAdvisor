@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}
+Рекомендации
+{% endblock %}
+
+{% block content %}
+
+<div class="mb-4">
+    <h1 class="fw-bold">Рекомендации курсов</h1>
+
+    <p class="text-muted">
+        Персональный список курсов, рассчитанный на основе интересов
+        и среднего балла студента.
+    </p>
+</div>
+
+{% if not student %}
+
+<div class="alert alert-warning">
+    В базе пока нет студентов. Сначала пройдите тест или сгенерируйте демо-данные.
+</div>
+
+<a href="/students/test/" class="btn btn-primary">
+    Пройти тест
+</a>
+
+{% else %}
+
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-4">
+
+        <h4 class="fw-bold mb-3">
+            Профиль студента
+        </h4>
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <strong>ФИО</strong>
+
+                <p class="text-muted">
+                    {{ student.full_name }}
+                </p>
+            </div>
+
+            <div class="col-md-3">
+                <strong>Группа</strong>
+
+                <p class="text-muted">
+                    {{ student.group_name }}
+                </p>
+            </div>
+
+            <div class="col-md-3">
+                <strong>Семестр</strong>
+
+                <p class="text-muted">
+                    {{ student.semester }}
+                </p>
+            </div>
+
+            <div class="col-md-3">
+                <strong>Средний балл</strong>
+
+                <p class="text-muted">
+                    {{ student.gpa }}
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="row">
+
+    {% for item in recommendations %}
+
+    <div class="col-md-6 col-lg-4 mb-4">
+
+        <div class="card h-100 border-0 shadow-sm rounded-4">
+
+            <div class="card-body p-4">
+
+                <div class="d-flex justify-content-between align-items-start mb-2">
+
+                    <h5 class="fw-bold">
+                        {{ item.course.title }}
+                    </h5>
+
+                    <span class="badge bg-secondary">
+                        {{ item.course.get_difficulty_display }}
+                    </span>
+
+                </div>
+
+                <p class="text-muted">
+                    {{ item.course.description }}
+                </p>
+
+                <p class="mb-1">
+                    <strong>Источник:</strong>
+                    {{ item.course.provider|default:item.course.teacher_name }}
+                </p>
+
+                {% if item.course.source_url %}
+                <p class="mb-1">
+                    <a href="{{ item.course.source_url }}" target="_blank" rel="noopener">
+                        Открыть курс
+                    </a>
+                </p>
+                {% endif %}
+
+                {% if item.course.direction %}
+                <p class="mb-1">
+                    <strong>Направление:</strong>
+                    {{ item.course.direction }}
+                </p>
+                {% endif %}
+
+                <p class="mb-1">
+                    <strong>Рейтинг:</strong>
+                    {{ item.score }}
+                </p>
+
+                <p class="mb-2">
+                    <strong>Вероятность успеха:</strong>
+                    {{ item.predicted_success }}%
+                </p>
+
+                <div class="progress mb-3" style="height: 10px;">
+
+                    <div
+                        class="progress-bar
+                        {% if item.predicted_success >= 80 %}
+                            bg-success
+                        {% elif item.predicted_success >= 60 %}
+                            bg-warning
+                        {% else %}
+                            bg-danger
+                        {% endif %}
+                        "
+
+                        role="progressbar"
+
+                        style="width: {{ item.predicted_success }}%;">
+
+                    </div>
+
+                </div>
+
+                <div class="alert alert-info mb-0">
+                    {{ item.explanation }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% empty %}
+
+    <div class="alert alert-warning">
+        Рекомендации пока отсутствуют.
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+{% endblock %}

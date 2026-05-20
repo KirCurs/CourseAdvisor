@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}
+Вход
+{% endblock %}
+
+{% block content %}
+
+<section class="page-header">
+    <div>
+        <span class="section-label">Авторизация</span>
+        <h1>Вход в систему</h1>
+        <p>
+            Войдите как студент, чтобы пройти тест и получить персональные
+            рекомендации. Для демо-студентов после генерации базы используется
+            пароль 12345.
+        </p>
+    </div>
+</section>
+
+<form method="post" class="profile-panel mx-auto" style="max-width: 520px;">
+    {% csrf_token %}
+
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            Неверный логин или пароль.
+        </div>
+    {% endif %}
+
+    <div class="mb-3">
+        <label class="form-label" for="{{ form.username.id_for_label }}">Логин</label>
+        <input
+            type="text"
+            name="{{ form.username.html_name }}"
+            autofocus
+            autocapitalize="none"
+            autocomplete="username"
+            class="form-control"
+            required
+            id="{{ form.username.id_for_label }}"
+        />
+    </div>
+
+    <div class="mb-4">
+        <label class="form-label" for="{{ form.password.id_for_label }}">Пароль</label>
+        <input
+            type="password"
+            name="{{ form.password.html_name }}"
+            autocomplete="current-password"
+            class="form-control"
+            required
+            id="{{ form.password.id_for_label }}"
+        />
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg w-100">
+        Войти
+    </button>
+</form>
+
+{% endblock %}

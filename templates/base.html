@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{% block title %}Система рекомендаций{% endblock %}</title>
+
+        <script>
+            const savedTheme = localStorage.getItem("courseadvisor-theme") || "light";
+            document.documentElement.dataset.theme = savedTheme;
+        </script>
+
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --bg: #eef4ff;
+                --surface: rgba(255, 255, 255, 0.88);
+                --surface-strong: #ffffff;
+                --muted: #607089;
+                --line: rgba(37, 99, 235, 0.18);
+                --accent: #2563eb;
+                --accent-2: #059669;
+                --accent-soft: #eaf2ff;
+                --ink: #152033;
+                --nav-bg: rgba(15, 23, 42, 0.94);
+                --shadow: 0 18px 55px rgba(37, 99, 235, 0.13);
+                --field-bg: #ffffff;
+                --field-ink: #152033;
+            }
+
+            :root[data-theme="dark"] {
+                --bg: #070b16;
+                --surface: rgba(12, 19, 34, 0.86);
+                --surface-strong: #0f172a;
+                --muted: #a8b4c7;
+                --line: rgba(125, 211, 252, 0.2);
+                --accent: #38bdf8;
+                --accent-2: #34d399;
+                --accent-soft: rgba(56, 189, 248, 0.14);
+                --ink: #eef6ff;
+                --nav-bg: rgba(2, 6, 23, 0.92);
+                --shadow: 0 22px 65px rgba(0, 0, 0, 0.38);
+                --field-bg: #111827;
+                --field-ink: #eef6ff;
+            }
+
+            * {
+                letter-spacing: 0;
+            }
+
+            body {
+                min-height: 100vh;
+                color: var(--ink);
+                background:
+                    radial-gradient(circle at 12% 15%, rgba(37, 99, 235, 0.23), transparent 28%),
+                    radial-gradient(circle at 88% 12%, rgba(5, 150, 105, 0.2), transparent 26%),
+                    linear-gradient(135deg, var(--bg), #f8fbff 55%, #eaf7f0);
+                transition: background 0.35s ease, color 0.25s ease;
+                overflow-x: hidden;
+            }
+
+            :root[data-theme="dark"] body {
+                background:
+                    radial-gradient(circle at 18% 12%, rgba(56, 189, 248, 0.2), transparent 28%),
+                    radial-gradient(circle at 82% 18%, rgba(52, 211, 153, 0.14), transparent 24%),
+                    linear-gradient(135deg, #050816, #0f172a 52%, #111827);
+            }
+
+            body::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                pointer-events: none;
+                background-image:
+                    linear-gradient(rgba(37, 99, 235, 0.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(37, 99, 235, 0.08) 1px, transparent 1px);
+                background-size: 42px 42px;
+                mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.65), transparent 72%);
+                animation: gridShift 18s linear infinite;
+            }
+
+            :root[data-theme="dark"] body::before {
+                background-image:
+                    linear-gradient(rgba(125, 211, 252, 0.08) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(125, 211, 252, 0.08) 1px, transparent 1px);
+            }
+
+            @keyframes gridShift {
+                from {
+                    transform: translate3d(0, 0, 0);
+                }
+                to {
+                    transform: translate3d(42px, 42px, 0);
+                }
+            }
+
+            @keyframes riseIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(14px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .navbar {
+                background: var(--nav-bg) !important;
+                backdrop-filter: blur(18px);
+            }
+
+            .theme-toggle {
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                color: #fff;
+                background: rgba(255, 255, 255, 0.08);
+                border-radius: 999px;
+                height: 34px;
+                padding: 0 12px;
+            }
+
+            .theme-toggle:hover {
+                background: rgba(255, 255, 255, 0.18);
+            }
+
+            main {
+                position: relative;
+                z-index: 1;
+            }
+
+            .page-header {
+                display: flex;
+                justify-content: space-between;
+                gap: 24px;
+                margin-bottom: 24px;
+                animation: riseIn 0.5s ease both;
+            }
+
+            .page-header h1 {
+                font-size: clamp(2rem, 4vw, 3.4rem);
+                font-weight: 800;
+                margin: 6px 0 10px;
+            }
+
+            .page-header p,
+            .muted-note,
+            .text-muted,
+            .lead,
+            .form-label {
+                color: var(--muted);
+            }
+
+            :root[data-theme="dark"] .text-muted,
+            :root[data-theme="dark"] .lead,
+            :root[data-theme="dark"] .form-label {
+                color: var(--muted) !important;
+            }
+
+            .section-label {
+                color: var(--accent);
+                font-size: 0.78rem;
+                font-weight: 800;
+                letter-spacing: 0;
+                text-transform: uppercase;
+            }
+
+            .test-layout {
+                display: grid;
+                gap: 20px;
+            }
+
+            .profile-panel,
+            .questions-panel,
+            .insight-panel {
+                background: var(--surface);
+                border: 1px solid var(--line);
+                border-radius: 8px;
+                padding: 24px;
+                box-shadow: var(--shadow);
+                backdrop-filter: blur(18px);
+                animation: riseIn 0.55s ease both;
+            }
+
+            .questions-panel {
+                animation-delay: 0.08s;
+            }
+
+            .profile-panel h2,
+            .questions-panel h2,
+            .insight-panel h2 {
+                font-size: 1.35rem;
+                font-weight: 800;
+                margin: 4px 0 16px;
+            }
+
+            .form-select,
+            .form-control {
+                color: var(--field-ink);
+                background-color: var(--field-bg);
+                border-color: var(--line);
+            }
+
+            .score-strip,
+            .metrics-strip {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 12px;
+                margin-top: 18px;
+            }
+
+            .score-strip div,
+            .metrics-strip div {
+                background: var(--accent-soft);
+                border: 1px solid var(--line);
+                border-radius: 8px;
+                padding: 14px 16px;
+            }
+
+            .score-strip span,
+            .metrics-strip span {
+                display: block;
+                color: var(--muted);
+                font-size: 0.9rem;
+            }
+
+            .score-strip strong,
+            .metrics-strip strong {
+                display: block;
+                font-size: 1.5rem;
+                margin-top: 2px;
+            }
+
+            .question-grid {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 14px;
+            }
+
+            .question-card {
+                border: 1px solid var(--line);
+                border-radius: 8px;
+                padding: 16px;
+                min-height: 150px;
+                background: rgba(255, 255, 255, 0.48);
+                transition: transform 0.18s ease, border-color 0.18s ease;
+            }
+
+            :root[data-theme="dark"] .question-card {
+                background: rgba(15, 23, 42, 0.62);
+            }
+
+            .question-card:hover {
+                border-color: var(--accent);
+                transform: translateY(-2px);
+            }
+
+            .question-title {
+                display: block;
+                font-weight: 700;
+                min-height: 48px;
+                margin-bottom: 14px;
+            }
+
+            .scale-row {
+                display: grid;
+                grid-template-columns: repeat(5, minmax(38px, 1fr));
+                gap: 8px;
+            }
+
+            .scale-option {
+                cursor: pointer;
+                text-align: center;
+            }
+
+            .scale-option input {
+                position: absolute;
+                opacity: 0;
+            }
+
+            .scale-option span {
+                display: grid;
+                place-items: center;
+                height: 42px;
+                border: 1px solid var(--line);
+                border-radius: 8px;
+                background: var(--field-bg);
+                color: var(--field-ink);
+                font-weight: 800;
+                transition: transform 0.12s ease, background 0.15s ease;
+            }
+
+            .scale-option input:checked + span {
+                background: linear-gradient(135deg, var(--accent), var(--accent-2));
+                border-color: transparent;
+                color: #ffffff;
+                transform: scale(1.04);
+            }
+
+            .submit-bar {
+                display: flex;
+                justify-content: flex-end;
+                gap: 12px;
+                animation: riseIn 0.55s ease both;
+                animation-delay: 0.12s;
+            }
+
+            .card {
+                background: var(--surface-strong);
+                color: var(--ink);
+            }
+
+            .bg-white {
+                background-color: var(--surface-strong) !important;
+                color: var(--ink);
+            }
+
+            a {
+                color: var(--accent);
+            }
+
+            .btn-outline-secondary {
+                color: var(--ink);
+                border-color: var(--line);
+            }
+
+            :root[data-theme="dark"] .btn-outline-secondary {
+                color: var(--ink);
+                border-color: rgba(238, 246, 255, 0.32);
+            }
+
+            .list-group-item,
+            .alert {
+                background-color: var(--surface-strong);
+                color: var(--ink);
+                border-color: var(--line);
+            }
+
+            footer {
+                color: var(--muted) !important;
+                border-color: var(--line) !important;
+            }
+
+            @media (max-width: 768px) {
+                .question-grid,
+                .score-strip,
+                .metrics-strip {
+                    grid-template-columns: 1fr;
+                }
+
+                .profile-panel,
+                .questions-panel,
+                .insight-panel {
+                    padding: 18px;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="/"> CourseAdvisor </a>
+
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                    <a href="/" class="btn btn-outline-light btn-sm">Главная</a>
+                    <a href="/students/test/" class="btn btn-success btn-sm">Тест</a>
+                    {% if user.is_authenticated %}
+                        <form method="post" action="/logout/" class="m-0">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-light btn-sm">
+                                Выйти
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="/login/" class="btn btn-primary btn-sm">Войти</a>
+                    {% endif %}
+                    <a href="/admin/" class="btn btn-outline-light btn-sm">Админка</a>
+                    <button class="theme-toggle" type="button" id="theme-toggle">
+                        Светлая
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <main class="container py-5">{% block content %} {% endblock %}</main>
+
+        <footer class="border-top py-3 mt-5 text-center">
+            Интеллектуальная веб-система рекомендаций учебных курсов
+        </footer>
+
+        <script>
+            const themeToggle = document.getElementById("theme-toggle");
+
+            function renderThemeButton() {
+                const theme = document.documentElement.dataset.theme || "light";
+                themeToggle.textContent = theme === "dark" ? "Темная" : "Светлая";
+            }
+
+            themeToggle.addEventListener("click", () => {
+                const current = document.documentElement.dataset.theme || "light";
+                const next = current === "dark" ? "light" : "dark";
+                document.documentElement.dataset.theme = next;
+                localStorage.setItem("courseadvisor-theme", next);
+                renderThemeButton();
+            });
+
+            renderThemeButton();
+        </script>
+    </body>
+</html>
